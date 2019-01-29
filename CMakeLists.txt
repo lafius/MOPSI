@@ -1,9 +1,9 @@
+PROJECT(ComponentTree)
+
 cmake_minimum_required(VERSION 2.6)
-file(TO_CMAKE_PATH "$ENV{IMAGINEPP_ROOT}/CMake" p)
-list(APPEND CMAKE_MODULE_PATH "${p}") #For old Imagine++
-list(APPEND CMAKE_SYSTEM_FRAMEWORK_PATH /Library/Frameworks) #Mac, why not auto?
+
 find_package(Imagine REQUIRED)
 
-project(ComponentTree)
-add_executable(ComponentTree componenttree.cpp componenttree.h)
+add_executable(ComponentTree main.cpp component_tree.h component_tree.cpp)
 ImagineUseModules(ComponentTree Graphics)
+
