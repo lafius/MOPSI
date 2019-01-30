@@ -13,6 +13,7 @@ public:
     int m_area;
     int m_level;
     int m_highest;
+    int m_volume;
     vector<Node> m_sons;
 
     Node();
@@ -20,7 +21,7 @@ public:
     void display(string prefix, string indent);
 };
 
-int MergeNodes(int node1, int node2, vector<Node> nodes, vector<int>& ParNode, vector<int>& Rnk);
+int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, vector<int>& Rnk);
 Node MakeNode(int level);
 void exchange(int& x, int& y);
 
@@ -41,3 +42,5 @@ int FindTree(int x, vector<int>& ParTree);
 int LinkNode(int x, int y, vector<int>& ParNode, vector<int>& Rnk);
 int LinkTree(int x, int y, vector<int>& ParTree, vector<int>& Rnk);
 bool isNeighbor(Vertex p, Vertex q);
+
+int ComputeVolume(Node n);

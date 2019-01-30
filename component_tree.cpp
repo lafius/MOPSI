@@ -14,6 +14,7 @@ Node::Node()
     m_level = 0;
     m_area = 1;
     m_highest = 0;
+    m_volume = 0;
 }
 
 void Node::addChild(Node son)
@@ -82,7 +83,7 @@ int LinkTree(int x, int y, vector<int>& ParTree, vector<int>& Rnk){
     return y;
 }
 
-int MergeNodes(int node1, int node2, vector<Node> nodes, vector<int>& ParNode, vector<int>& Rnk)
+int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, vector<int>& Rnk)
 {
     int tmpNode = LinkNode(node1, node2, ParNode, Rnk);
     int tmpNode2;
@@ -130,3 +131,14 @@ bool isNeighbor(Vertex p, Vertex q)
 }
 
 
+int ComputeVolume(Node n)
+{
+    int vol = n.m_area;
+    vector<Node> sons = n.m_sons;
+    for(vector<Node>::iterator it=sons.begin(); it!=sons.end(); it++)
+    {
+        vol += ComputeVolume(*it) + (*it).m_area*((*it).m_level - n.m_level);
+    }
+    n.m_volume = vol;
+    return(vol);
+}
