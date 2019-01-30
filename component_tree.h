@@ -21,6 +21,7 @@ public:
 
 int MergeNodes(int node1, int node2, vector<Node> nodes, vector<int>& ParNode, vector<int>& Rnk);
 Node MakeNode(int level);
+void exchange(int& x, int& y);
 
 class Vertex
 {

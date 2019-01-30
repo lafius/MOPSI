@@ -21,6 +21,12 @@ void Node::addChild(Node son)
     m_sons.push_back(son);
 }
 
+void exchange(int& x, int& y)
+{
+    int temp=x;
+    x=y;
+    y=temp;
+}
 
 void MakeSetNode(int x, vector<int>& ParNode, vector<int>& Rnk){
     ParNode[x] = x;
@@ -48,7 +54,7 @@ int FindTree(int x, vector<int>& ParTree){
 
 int LinkNode(int x, int y, vector<int>& ParNode, vector<int>& Rnk){
     if(Rnk[x] > Rnk[y]){
-        LinkNode(y, x, ParNode, Rnk);
+        exchange(x, y);
     }
     if(Rnk[x] == Rnk[y]){
         Rnk[y]+=1;
@@ -59,7 +65,7 @@ int LinkNode(int x, int y, vector<int>& ParNode, vector<int>& Rnk){
 
 int LinkTree(int x, int y, vector<int>& ParTree, vector<int>& Rnk){
     if(Rnk[x] > Rnk[y]){
-        LinkTree(y, x, ParTree, Rnk);
+        exchange(x, y);
     }
     if(Rnk[x] == Rnk[y]){
         Rnk[y]+=1;
@@ -72,13 +78,18 @@ int MergeNodes(int node1, int node2, vector<Node> nodes, vector<int>& ParNode, v
 {
     int tmpNode = LinkNode(node1, node2, ParNode, Rnk);
     int tmpNode2;
-    if(tmpNode == node2){
-        for(vector<Node>::iterator it=nodes[node1].m_sons.begin(); it!=nodes[node1].m_sons.end(); it++){
+    if(tmpNode == node2)
+    {
+        for(vector<Node>::iterator it=nodes[node1].m_sons.begin(); it!=nodes[node1].m_sons.end(); it++)
+        {
             nodes[node2].m_sons.push_back(*it);
         }
         tmpNode2 = node1;
-    } else {
-        for(vector<Node>::iterator it=nodes[node2].m_sons.begin(); it!=nodes[node2].m_sons.end(); it++){
+    }
+    else
+    {
+        for(vector<Node>::iterator it=nodes[node2].m_sons.begin(); it!=nodes[node2].m_sons.end(); it++)
+        {
             nodes[node1].m_sons.push_back(*it);
         }
         tmpNode2 = node2;

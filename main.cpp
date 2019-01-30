@@ -72,6 +72,7 @@ int main(){
 
     // step 3
     vector<Vertex> already_processed;
+
     for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
     {
         int p = (*it).m_i + W*(*it).m_j;
@@ -80,7 +81,7 @@ int main(){
 
         for(vector<Vertex>::iterator it2=already_processed.begin(); it2!=already_processed.end(); it2++)
         {
-            if (isNeighbor(*it, *it2))
+            if (isNeighbor(*it, *it2) && (*it2).m_level >= (*it).m_level)
             {
                 int q = (*it2).m_i + W*(*it2).m_j;
                 int adjTree = FindTree(q, ParTree);
@@ -103,11 +104,13 @@ int main(){
                 }
             }
         }
+
         already_processed.push_back(*it);
     }
 
     // step 15
     root = lowestNode[FindTree(FindNode(0, ParNode), ParTree)];
+    delete [] lowestNode;
 
     // step 16
     for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
@@ -117,7 +120,6 @@ int main(){
         cout << M[p] << endl;
     }
 
-    delete [] lowestNode;
     delete [] M;
 
     return(0);
