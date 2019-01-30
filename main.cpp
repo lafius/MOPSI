@@ -48,14 +48,14 @@ int main(){
 
     // sort imageV by level decreasing
     sort(imageV.begin(), imageV.end(), compareV);
-    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++){
+    /*for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++){
             std::cout << "i = " << (*it).m_i << "; " << "j = " << (*it).m_j << "; " << "level = " << (*it).m_level << std::endl;
-    }
+    }*/
 
     // step 2
     int* lowestNode = new int[W*H];
     int root;
-    map<int, int> M;
+    int* M = new int[W*H];
     vector<int> ParNode(W*H, 0);
     vector<int> ParTree(W*H, 0);
     vector<int> Rnk(W*H, 0);
@@ -103,6 +103,7 @@ int main(){
                 }
             }
         }
+        already_processed.push_back(*it);
     }
 
     // step 15
@@ -113,8 +114,11 @@ int main(){
     {
         int p = (*it).m_i + W*(*it).m_j;
         M[p] = FindNode(p, ParNode);
+        cout << M[p] << endl;
     }
 
     delete [] lowestNode;
-return(0);
+    delete [] M;
+
+    return(0);
 }
