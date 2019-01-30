@@ -21,6 +21,14 @@ void Node::addChild(Node son)
     m_sons.push_back(son);
 }
 
+void Node::display(string prefix, string indent){
+    cout << prefix << m_level;
+    for(vector<Node>::iterator it=m_sons.begin(); it!=m_sons.end(); it++){
+        cout << endl;
+        (*it).display(prefix + indent, indent);
+    }
+}
+
 void exchange(int& x, int& y)
 {
     int temp=x;
@@ -120,3 +128,5 @@ bool isNeighbor(Vertex p, Vertex q)
     }
     return(isNeighbor);
 }
+
+

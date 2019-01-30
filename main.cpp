@@ -13,7 +13,7 @@ bool compareV(Vertex v1, Vertex v2)
 
 int main(){
     const char *image_file =
-    (argc > 1) ? argv[1] : srcPath("exemple.png");
+    (argc > 1) ? argv[1] : srcPath("article.png");
     // Load image
     byte* image;
     int W, H;
@@ -108,6 +108,29 @@ int main(){
         already_processed.push_back(*it);
     }
 
+    for(int j=0; j<H; j++){
+        for(int i=0; i<W; i++){
+            cout << ParNode[i+W*j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl << endl;
+    for(int j=0; j<H; j++){
+        for(int i=0; i<W; i++){
+            cout << ParTree[i+W*j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl << endl;
+
+    for(int j=0; j<H; j++){
+        for(int i=0; i<W; i++){
+            cout << lowestNode[i+W*j] << " ";
+        }
+        cout << endl;
+    }
+
     // step 15
     root = lowestNode[FindTree(FindNode(0, ParNode), ParTree)];
     delete [] lowestNode;
@@ -117,8 +140,10 @@ int main(){
     {
         int p = (*it).m_i + W*(*it).m_j;
         M[p] = FindNode(p, ParNode);
-        cout << M[p] << endl;
+        //cout << M[p] << endl;
     }
+
+    //nodes[root].display("* ", " ");
 
     delete [] M;
 

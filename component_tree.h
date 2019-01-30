@@ -17,6 +17,7 @@ public:
 
     Node();
     void addChild(Node son);
+    void display(string prefix, string indent);
 };
 
 int MergeNodes(int node1, int node2, vector<Node> nodes, vector<int>& ParNode, vector<int>& Rnk);
