@@ -42,5 +42,4 @@ int FindTree(int x, vector<int>& ParTree);
 int LinkNode(int x, int y, vector<int>& ParNode, vector<int>& Rnk);
 int LinkTree(int x, int y, vector<int>& ParTree, vector<int>& Rnk);
 bool isNeighbor(Vertex p, Vertex q);
-
 int ComputeVolume(Node n);

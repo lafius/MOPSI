@@ -3,77 +3,52 @@
 #include <map>
 using namespace Imagine;
 
-//set<int> Qnode;
-//set<Node> Qtree;
+/*
+ *
+ * Definition de l'Algorithme
+ *
+ *
+*/
 
-bool compareV(Vertex v1, Vertex v2)
+bool compareVertex(Vertex v1, Vertex v2)
 {
     return(v1.m_level > v2.m_level);
 }
 
-int main(){
-    const char *image_file =
-    (argc > 1) ? argv[1] : srcPath("article.png");
-    // Load image
-    byte* image;
-    int W, H;
-    cout << "Loading image: " << image_file << endl;
-    loadGreyImage(image_file, image, W, H);
-    // Print statistics
-    cout << "Image size: " << W << "x" << H << endl;
-    cout << "Number of pixels: " << W*H << endl;
-    // Display image
-    cout << "Image de dimension une puissance de 2" << endl;
-    Window window = openWindow(W, H);
-    putGreyImage(IntPoint2(0,0), image, W, H);
-    //click();
-
-    // cree vecteur nodes
-    vector<Node> nodes;
-    for(int j=0; j<H; j++){
-        for(int i=0; i<W; i++){
-            Node n = MakeNode(int(image[i+W*j]));
-            nodes.push_back(n);
-        }
-    }
-
-    vector<Vertex> imageV;
+int BuildingComponentTree(byte* image, vector<Node>& Nodes, int*& M, int W, int H){
+    vector<Vertex> imageDec;
     for(int j=0; j<H; j++){
         for(int i=0; i<W; i++){
             int level = image[i+W*j];
             Vertex v(i, j, level);
-            imageV.push_back(v);
+            imageDec.push_back(v);
         }
     }
 
-    // sort imageV by level decreasing
-    sort(imageV.begin(), imageV.end(), compareV);
-    /*for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++){
-            std::cout << "i = " << (*it).m_i << "; " << "j = " << (*it).m_j << "; " << "level = " << (*it).m_level << std::endl;
-    }*/
+    // sort imageDec by level decreasing
+    sort(imageDec.begin(), imageDec.end(), compareVertex);
 
     // step 2
     int* lowestNode = new int[W*H];
     int root;
-    int* M = new int[W*H];
     vector<int> ParNode(W*H, 0);
     vector<int> ParTree(W*H, 0);
     vector<int> Rnk(W*H, 0);
 
-    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+    for(vector<Vertex>::iterator it=imageDec.begin(); it!=imageDec.end(); it++)
     {
         int p = (*it).m_i + W*(*it).m_j;
         int level = (*it).m_level;
         MakeSetTree(p, ParTree, Rnk);
         MakeSetNode(p, ParNode, Rnk);
-        nodes[p] = MakeNode(level);
+        Nodes[p] = MakeNode(level);
         lowestNode[p] = p;
     }
 
     // step 3
     vector<Vertex> already_processed;
 
-    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+    for(vector<Vertex>::iterator it=imageDec.begin(); it!=imageDec.end(); it++)
     {
         int p = (*it).m_i + W*(*it).m_j;
         int curTree = FindTree(p, ParTree);
@@ -89,15 +64,15 @@ int main(){
 
                 if (curNode != adjNode)
                 {
-                    if (nodes[curNode].m_level == nodes[adjNode].m_level)
+                    if (Nodes[curNode].m_level == Nodes[adjNode].m_level)
                     {
-                        curNode = MergeNodes(adjNode, curNode, nodes, ParNode, Rnk);
+                        curNode = MergeNodes(adjNode, curNode, Nodes, ParNode, Rnk);
                     }
                     else
                     {
-                        nodes[curNode].addChild(nodes[adjNode]);
-                        nodes[curNode].m_area += nodes[adjNode].m_area;
-                        nodes[curNode].m_highest = std::max(nodes[curNode].m_highest, nodes[adjNode].m_highest);
+                        Nodes[curNode].addChild(Nodes[adjNode]);
+                        Nodes[curNode].m_area += Nodes[adjNode].m_area;
+                        Nodes[curNode].m_highest = std::max(Nodes[curNode].m_highest, Nodes[adjNode].m_highest);
                     }
                     curTree = LinkTree(adjTree, curTree, ParTree, Rnk);
                     lowestNode[curTree] = curNode;
@@ -128,7 +103,7 @@ int main(){
     }
 
     cout << endl;
-    cout << "lowestNode :" << endl;
+    cout << "LowestNode :" << endl;
 
     for(int j=0; j<H; j++){
         for(int i=0; i<W; i++){
@@ -142,27 +117,186 @@ int main(){
     delete [] lowestNode;
 
     // step 16
-    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+    for(vector<Vertex>::iterator it=imageDec.begin(); it!=imageDec.end(); it++)
     {
         int p = (*it).m_i + W*(*it).m_j;
         M[p] = FindNode(p, ParNode);
-        //cout << M[p] << endl;
     }
 
+    return root;
+}
+
+
+/*
+ *
+ * MAIN
+ *
+ *
+*/
+
+int main(){
+    const char *image_file =
+    (argc > 1) ? argv[1] : srcPath("article.png");
+    // Load image
+    byte* image;
+    int W, H;
+    cout << "Loading image: " << image_file << endl;
+    loadGreyImage(image_file, image, W, H);
+    // Print statistics
+    cout << "Image size: " << W << "x" << H << endl;
+    cout << "Number of pixels: " << W*H << endl;
+    // Display image
+    Window window = openWindow(W, H);
+    putGreyImage(IntPoint2(0,0), image, W, H);
+
+    // Initialisation du vecteur nodes
+    vector<Node> nodes;
+    for(int j=0; j<H; j++){
+        for(int i=0; i<W; i++){
+            Node n = MakeNode(int(image[i+W*j]));
+            nodes.push_back(n);
+        }
+    }
+
+    // on initialise M
+    int* M = new int[W*H];
+
+//    vector<Vertex> imageV;
+//    for(int j=0; j<H; j++){
+//        for(int i=0; i<W; i++){
+//            int level = image[i+W*j];
+//            Vertex v(i, j, level);
+//            imageV.push_back(v);
+//        }
+//    }
+
+//    // sort imageV by level decreasing
+//    sort(imageV.begin(), imageV.end(), compareV);
+//    /*for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++){
+//            std::cout << "i = " << (*it).m_i << "; " << "j = " << (*it).m_j << "; " << "level = " << (*it).m_level << std::endl;
+//    }*/
+
+//    // step 2
+//    int* lowestNode = new int[W*H];
+//    int root;
+//    int* M = new int[W*H];
+//    vector<int> ParNode(W*H, 0);
+//    vector<int> ParTree(W*H, 0);
+//    vector<int> Rnk(W*H, 0);
+
+//    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+//    {
+//        int p = (*it).m_i + W*(*it).m_j;
+//        int level = (*it).m_level;
+//        MakeSetTree(p, ParTree, Rnk);
+//        MakeSetNode(p, ParNode, Rnk);
+//        nodes[p] = MakeNode(level);
+//        lowestNode[p] = p;
+//    }
+
+//    // step 3
+//    vector<Vertex> already_processed;
+
+//    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+//    {
+//        int p = (*it).m_i + W*(*it).m_j;
+//        int curTree = FindTree(p, ParTree);
+//        int curNode = FindNode(lowestNode[curTree], ParNode);
+
+//        for(vector<Vertex>::iterator it2=already_processed.begin(); it2!=already_processed.end(); it2++)
+//        {
+//            if (isNeighbor(*it, *it2) && (*it2).m_level >= (*it).m_level)
+//            {
+//                int q = (*it2).m_i + W*(*it2).m_j;
+//                int adjTree = FindTree(q, ParTree);
+//                int adjNode = FindNode(lowestNode[adjTree], ParNode);
+
+//                if (curNode != adjNode)
+//                {
+//                    if (nodes[curNode].m_level == nodes[adjNode].m_level)
+//                    {
+//                        curNode = MergeNodes(adjNode, curNode, nodes, ParNode, Rnk);
+//                    }
+//                    else
+//                    {
+//                        nodes[curNode].addChild(nodes[adjNode]);
+//                        nodes[curNode].m_area += nodes[adjNode].m_area;
+//                        nodes[curNode].m_highest = std::max(nodes[curNode].m_highest, nodes[adjNode].m_highest);
+//                    }
+//                    curTree = LinkTree(adjTree, curTree, ParTree, Rnk);
+//                    lowestNode[curTree] = curNode;
+//                }
+//            }
+//        }
+
+//        already_processed.push_back(*it);
+//    }
+
+//    cout << endl;
+//    cout << "ParNode :" << endl;
+//    for(int j=0; j<H; j++){
+//        for(int i=0; i<W; i++){
+//            cout << ParNode[i+W*j] << " ";
+//        }
+//        cout << endl;
+//    }
+
+//    cout << endl;
+//    cout << "ParTree :" << endl;
+
+//    for(int j=0; j<H; j++){
+//        for(int i=0; i<W; i++){
+//            cout << ParTree[i+W*j] << " ";
+//        }
+//        cout << endl;
+//    }
+
+//    cout << endl;
+//    cout << "lowestNode :" << endl;
+
+//    for(int j=0; j<H; j++){
+//        for(int i=0; i<W; i++){
+//            cout << lowestNode[i+W*j] << " ";
+//        }
+//        cout << endl;
+//    }
+
+//    // step 15
+//    root = lowestNode[FindTree(FindNode(0, ParNode), ParTree)];
+//    delete [] lowestNode;
+
+//    // step 16
+//    for(vector<Vertex>::iterator it=imageV.begin(); it!=imageV.end(); it++)
+//    {
+//        int p = (*it).m_i + W*(*it).m_j;
+//        M[p] = FindNode(p, ParNode);
+//        //cout << M[p] << endl;
+//    }
+
+    int root = BuildingComponentTree(image, nodes, M, W, H);
+
     cout << endl;
-    cout << "arbre des composantes connexes :" << endl;
+    cout << "Affichage de l'arbre des composantes connexes :" << endl;
     nodes[root].display("* ", " ");
     cout << endl << endl;
 
-    cout << "volume :" << endl;
+    cout << "Volume :" << endl;
     cout << ComputeVolume(nodes[root]) << endl;
     cout << endl << endl;
 
-    delete [] M;
+    // Reconstruire l'image
+    byte* imageRec = new byte[W*H];
+    for(int j=0; j<H; j++){
+        for(int i=0; i<W; i++){
+            imageRec[i+W*j] = byte(nodes[M[i+W*j]].m_level);
+        }
+    }
 
+    saveGreyImage("out.png", imageRec, W, H);
 
+    delete[] imageRec;
 
-
+    delete[] M;
 
 //    // Keep Lobes
 
