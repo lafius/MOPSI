@@ -15,6 +15,20 @@ Node::Node()
     m_area = 1;
     m_highest = 0;
     m_volume = 0;
+    m_mark = false;
+    m_parent = -1;
+}
+
+int Node::getAttribute(string str){
+    if(str == "area"){
+        return m_area;
+    }
+    if(str == "highest"){
+        return m_highest;
+    }
+    if(str == "volume"){
+        return m_volume;
+    }
 }
 
 void Node::addChild(Node son)
@@ -91,6 +105,7 @@ int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, 
     {
         for(vector<Node>::iterator it=nodes[node1].m_sons.begin(); it!=nodes[node1].m_sons.end(); it++)
         {
+            (*it).m_parent = node2;
             nodes[node2].m_sons.push_back(*it);
         }
         tmpNode2 = node1;
@@ -99,6 +114,7 @@ int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, 
     {
         for(vector<Node>::iterator it=nodes[node2].m_sons.begin(); it!=nodes[node2].m_sons.end(); it++)
         {
+            (*it).m_parent = node1;
             nodes[node1].m_sons.push_back(*it);
         }
         tmpNode2 = node2;

@@ -14,11 +14,14 @@ public:
     int m_level;
     int m_highest;
     int m_volume;
+    bool m_mark;
     vector<Node> m_sons;
+    int m_parent;
 
     Node();
     void addChild(Node son);
     void display(string prefix, string indent);
+    int getAttribute(string str);
 };
 
 int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, vector<int>& Rnk);
