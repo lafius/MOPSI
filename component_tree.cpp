@@ -295,7 +295,7 @@ int BuildingComponentTree(byte* image, vector<Node>& nodes, int*& M, int W, int 
         for(int i=0; i<W; i++)
         {
             int p = i+W*j;
-            if (nodes[p].m_parent == -1 && p != root)
+            if (nodes[p].m_parent == -1)
             {
                 nodes[p].m_parent = FindNode(p, ParNode);
                 if (nodes[nodes[p].m_parent].m_level == nodes[p].m_level)
@@ -306,8 +306,6 @@ int BuildingComponentTree(byte* image, vector<Node>& nodes, int*& M, int W, int 
         }
         cout << endl;
     }
-
-    nodes[root].m_parent = root;
 
     cout << endl;
     cout << "Parent :" << endl;
@@ -369,6 +367,7 @@ byte* KeepNLobes(vector<Node>& nodes, int W, int H, int* M, int NbLobes, string 
     byte* F = new byte[W*H];
     sort(nodes.begin(), nodes.end(), less_than_key(attribute));
     int L = nbLeaf(nodes);
+    cout << "nbLeaf = " << L << endl;
     while(L > NbLobes)
     {
         for(vector<Node>::iterator it=nodes.begin(); it!=nodes.end(); it++)
