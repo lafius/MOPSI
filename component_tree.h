@@ -4,8 +4,13 @@
 #include<iostream>
 #include<set>
 #include "math.h"
-
+#include <map>
 using namespace std;
+
+#include<Imagine/Graphics.h>
+using namespace Imagine;
+
+
 
 class Node
 {
@@ -17,6 +22,8 @@ public:
     bool m_mark;
     vector<Node> m_sons;
     int m_parent;
+    int m_nbChildren;
+    int m_position;
 
     Node();
     void addChild(Node son);
@@ -25,8 +32,23 @@ public:
 };
 
 int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, vector<int>& Rnk);
-Node MakeNode(int level);
+Node MakeNode(int position, int level);
 void exchange(int& x, int& y);
+
+class less_than_key
+{
+    string m_key;
+public:
+
+    less_than_key(string attribute)
+    {
+        m_key = attribute;
+    }
+    bool operator() (Node n1, Node n2)
+    {
+        return (n1.getAttribute(m_key) < n2.getAttribute(m_key));
+    }
+};
 
 class Vertex
 {
@@ -46,3 +68,12 @@ int LinkNode(int x, int y, vector<int>& ParNode, vector<int>& Rnk);
 int LinkTree(int x, int y, vector<int>& ParTree, vector<int>& Rnk);
 bool isNeighbor(Vertex p, Vertex q);
 int ComputeVolume(Node n);
+
+bool compareVertex(Vertex v1, Vertex v2);
+
+int BuildingComponentTree(byte* image, vector<Node>& Nodes, int*& M, int W, int H);
+void RebuildImage(vector<Node> nodes, int W, int H, int* M, const char* str);
+
+int RemoveLobe(int n, vector<Node>& nodes);
+int nbLeaf(vector<Node> nodes);
+byte* KeepNLobes(vector<Node>& nodes, int W, int H, int* M, int NbLobes, string attribute);
