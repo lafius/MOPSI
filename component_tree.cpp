@@ -152,7 +152,6 @@ bool isNeighbor(Vertex p, Vertex q)
     return(isNeighbor);
 }
 
-
 int ComputeVolume(Node n)
 {
     int vol = n.m_area;
@@ -322,7 +321,6 @@ int BuildingComponentTree(byte* image, vector<Node>& nodes, int*& M, int W, int 
     return root;
 }
 
-
 void RebuildImage(vector<Node> nodes, int W, int H, int* M, const char* str)
 {
     byte* imageRec = new byte[W*H];
@@ -348,25 +346,29 @@ int RemoveLobe(int n, vector<Node>& nodes)
     return(n);
 }
 
-int nbLeaf(vector<Node> nodes)
+int nbLeaf(Node n)
 {
     int nb_leaf = 0;
-    for(vector<Node>::iterator it=nodes.begin(); it!=nodes.end(); it++)
+    if (n.m_sons.size() == 0)
     {
-        if ((*it).m_sons.size() == 0)
+        nb_leaf += 1;
+    }
+    else
+    {
+        for(vector<Node>::iterator it=n.m_sons.begin(); it!=n.m_sons.end(); it++)
         {
-            nb_leaf += 1;
+            nb_leaf += nbLeaf(*it);
         }
     }
     return(nb_leaf);
 }
 
-byte* KeepNLobes(vector<Node>& nodes, int W, int H, int* M, int NbLobes, string attribute)
+byte* KeepNLobes(vector<Node>& nodes, Node root, int W, int H, int* M, int NbLobes, string attribute)
 {
     set<int> Q;
     byte* F = new byte[W*H];
     sort(nodes.begin(), nodes.end(), less_than_key(attribute));
-    int L = nbLeaf(nodes);
+    int L = nbLeaf(root);
     cout << "nbLeaf = " << L << endl;
     while(L > NbLobes)
     {

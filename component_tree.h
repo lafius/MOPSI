@@ -75,5 +75,5 @@ int BuildingComponentTree(byte* image, vector<Node>& Nodes, int*& M, int W, int 
 void RebuildImage(vector<Node> nodes, int W, int H, int* M, const char* str);
 
 int RemoveLobe(int n, vector<Node>& nodes);
-int nbLeaf(vector<Node> nodes);
-byte* KeepNLobes(vector<Node>& nodes, int W, int H, int* M, int NbLobes, string attribute);
+int nbLeaf(Node n);
+byte* KeepNLobes(vector<Node>& nodes, Node root, int W, int H, int* M, int NbLobes, string attribute);
