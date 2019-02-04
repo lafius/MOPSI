@@ -13,16 +13,19 @@ Node MakeNode(int position, int level)
 Node::Node()
 {
     m_level = 0;
-    m_area = 1;
+    m_area = 0;
     m_highest = 0;
     m_volume = 0;
     m_mark = false;
     m_parent = -1;
-    m_nbChildren = -1;
+    m_nbChildren = 0;
     m_position = -1;
 }
 
 int Node::getAttribute(string str){
+    if(str == "level"){
+        return m_level;
+    }
     if(str == "area"){
         return m_area;
     }
@@ -46,6 +49,16 @@ void Node::display(string prefix, string indent){
         cout << endl;
         (*it).display(prefix + indent, indent);
     }
+}
+
+bool isLeaf(Node n, vector<Node> nodes)
+{
+    bool is_leaf = false;
+    if (n.m_sons.size() == 0 && nodes[n.m_canonic].m_sons.size() == 0)
+    {
+        is_leaf = true;
+    }
+    return(is_leaf);
 }
 
 void exchange(int& x, int& y)
@@ -110,8 +123,7 @@ int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, 
         for(vector<Node>::iterator it=nodes[node1].m_sons.begin(); it!=nodes[node1].m_sons.end(); it++)
         {
             (*it).m_parent = node2;
-            nodes[node2].m_sons.push_back(*it);
-            nodes[node2].m_nbChildren +=1 ;
+            nodes[node2].addChild(*it);
         }
         tmpNode2 = node1;
     }
@@ -120,11 +132,11 @@ int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, 
         for(vector<Node>::iterator it=nodes[node2].m_sons.begin(); it!=nodes[node2].m_sons.end(); it++)
         {
             (*it).m_parent = node1;
-            nodes[node1].m_sons.push_back(*it);
-            nodes[node1].m_nbChildren +=1;
+            nodes[node1].addChild(*it);
         }
         tmpNode2 = node2;
     }
+    nodes[tmpNode2].m_canonic = tmpNode;
     nodes[tmpNode].m_area = nodes[tmpNode].m_area + nodes[tmpNode2].m_area;
     nodes[tmpNode].m_highest = max(nodes[tmpNode].m_highest, nodes[tmpNode2].m_highest);
     return tmpNode;
@@ -303,10 +315,8 @@ int BuildingComponentTree(byte* image, vector<Node>& nodes, int*& M, int W, int 
                 }
             }
         }
-        cout << endl;
     }
 
-    cout << endl;
     cout << "Parent :" << endl;
 
     for(int j=0; j<H; j++)
@@ -342,6 +352,17 @@ int RemoveLobe(int n, vector<Node>& nodes)
     if(nodes[n].m_mark == true)
     {
         nodes[n] = nodes[RemoveLobe(nodes[n].m_parent, nodes)];
+        cout << "removeLobe" << endl;
+    }
+    return(n);
+}
+
+Node RemoveLobe2(Node& n, vector<Node>& nodes)
+{
+    if(n.m_mark == true)
+    {
+        n = RemoveLobe2(nodes[n.m_parent], nodes);
+        cout << "removeLobe2" << endl;
     }
     return(n);
 }
@@ -365,37 +386,76 @@ int nbLeaf(Node n)
 
 byte* KeepNLobes(vector<Node>& nodes, Node root, int W, int H, int* M, int NbLobes, string attribute)
 {
-    set<int> Q;
+    set<Node> Q;
     byte* F = new byte[W*H];
-    sort(nodes.begin(), nodes.end(), less_than_key(attribute));
+    cout << "nodes not sorted : " << endl;
+    for(vector<Node>::iterator it=nodes.begin(); it!=nodes.end(); it++)
+    {
+         cout << (*it).getAttribute(attribute) << endl;
+    }
+    cout << endl;
+    vector<Node> nodes_sorted = nodes;
+    sort(nodes_sorted.begin(), nodes_sorted.end(), less_than_key(attribute));
+    cout << "nodes sorted by increasing " << attribute << " : " << endl;
+    for(vector<Node>::iterator it=nodes_sorted.begin(); it!=nodes_sorted.end(); it++)
+    {
+         cout << (*it).getAttribute(attribute) << endl;
+    }
+
     int L = nbLeaf(root);
+    cout << endl;
     cout << "nbLeaf = " << L << endl;
+    cout << endl;
+
     while(L > NbLobes)
     {
-        for(vector<Node>::iterator it=nodes.begin(); it!=nodes.end(); it++)
+        cout << "L = " << L << endl;
+        for(vector<Node>::iterator it=nodes_sorted.begin(); it!=nodes_sorted.end(); it++)
         {
-            if ((*it).m_sons.size() == 0 && (*it).m_mark == false)
+            if (isLeaf(*it, nodes) && (*it).m_mark == false)
             {
-                int c = (*it).m_position;
-                int p = nodes[c].m_parent;
+                cout << (*it).m_level << endl;
+                int p = (*it).m_parent;
+                cout << p << endl;
+                nodes[p].m_nbChildren =  nodes[p].m_sons.size();
                 nodes[p].m_nbChildren -= 1;
                 if (nodes[p].m_nbChildren > 0)
                 {
-                    L = L-1;
+                    cout << "yes!" << endl;
+                    L = L- 1;
                 }
-                nodes[c].m_mark = true;
-                Q.insert(c);
+                (*it).m_mark = true;
+                nodes[(*it).m_position].m_mark = true;
+                Q.insert(*it);
+                break;
+
+//                int c = (*it).m_position;
+//                int p = nodes[c].m_parent;
+//                nodes[p].m_nbChildren -= 1;
+//                if (nodes[p].m_nbChildren > 0)
+//                {
+//                    L = L-1;
+//                }
+//                nodes[c].m_mark = true;
+//                Q.insert(c);
             }
 
         }
     }
 
+    cout << endl;
+
     while (Q.empty() == false)
     {
-        set<int>::iterator it;
-        it = Q.begin();
+        cout << "Q in not empty" << endl;
+        set<Node>::iterator it = Q.begin();
         Q.erase(*it);
-        RemoveLobe(*it, nodes);
+        //cout << "*it.m_position = " << (*it).m_position << endl;
+        RemoveLobe((*it).m_position, nodes); //nodes_sorted ?
+
+//        set<int>::iterator it = Q.begin();
+//        Q.erase(*it);
+//        RemoveLobe(*it, nodes);
     }
 
     for(int j=0; j<H; j++)

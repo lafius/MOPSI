@@ -11,7 +11,6 @@ using namespace std;
 using namespace Imagine;
 
 
-
 class Node
 {
 public:
@@ -24,13 +23,17 @@ public:
     int m_parent;
     int m_nbChildren;
     int m_position;
+    int m_canonic;
 
     Node();
     void addChild(Node son);
     void display(string prefix, string indent);
     int getAttribute(string str);
+    bool operator<(const Node n) const
+        {return m_level < n.m_level;}
 };
 
+bool isLeaf(Node n, vector<Node> nodes);
 int MergeNodes(int node1, int node2, vector<Node>& nodes, vector<int>& ParNode, vector<int>& Rnk);
 Node MakeNode(int position, int level);
 void exchange(int& x, int& y);
@@ -75,5 +78,6 @@ int BuildingComponentTree(byte* image, vector<Node>& Nodes, int*& M, int W, int 
 void RebuildImage(vector<Node> nodes, int W, int H, int* M, const char* str);
 
 int RemoveLobe(int n, vector<Node>& nodes);
+Node RemoveLobe2(Node &n, vector<Node>& nodes);
 int nbLeaf(Node n);
 byte* KeepNLobes(vector<Node>& nodes, Node root, int W, int H, int* M, int NbLobes, string attribute);

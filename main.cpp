@@ -47,7 +47,7 @@ int main(){
 
     // Keep N Lobes
 
-    byte* keepLobes = KeepNLobes(nodes, nodes[root], W, H, M, 1, "area");
+    byte* keepLobes = KeepNLobes(nodes, nodes[root], W, H, M, 1, "level");
     RebuildImage(nodes, W, H, M, "keepLobes.png");
 
     delete[] M;
