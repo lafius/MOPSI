@@ -4,7 +4,7 @@
 
 int main(){
     const char *image_file =
-    (argc > 1) ? argv[1] : srcPath("exemple.png");
+    (argc > 1) ? argv[1] : srcPath("exemple2.png");
     // Load image
     byte* image;
     int W, H;
@@ -43,12 +43,12 @@ int main(){
     cout << endl << endl;
 
     // Reconstruire l'image
-    RebuildImage(nodes, W, H, M, "exemple_out.png");
+    RebuildImage(nodes, W, H, M, "exemple2_out.png");
 
     // Keep N Lobes
 
     byte* keepLobes = KeepNLobes(nodes, nodes[root], W, H, M, 1, "level");
-    RebuildImage(nodes, W, H, M, "exemple_keepLobes_incr.png");
+    RebuildImage(nodes, W, H, M, "exemple2_keepLobes_incr.png");
 
     delete[] M;
 
